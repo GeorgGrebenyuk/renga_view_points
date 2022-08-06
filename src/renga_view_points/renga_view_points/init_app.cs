@@ -9,7 +9,9 @@ namespace renga_view_points
         //Свойство с точками
         public static Guid prop_id = Guid.Parse("88163fb8-00d4-40dc-a75b-b3ac3c44141d");
         public static string prop_name = "Saved_view_points";
+
         public static string vp_file_path = null;
+        public static string dir_save_images = null;
         public static bool use_hidded_objects = false;
 
         public static Renga.Application renga_application = null;

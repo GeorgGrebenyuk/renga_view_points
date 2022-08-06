@@ -108,7 +108,7 @@ namespace renga_view_points
         /// <param name="name"></param>
         /// <param name="image_width"></param>
         /// <param name="image_height"></param>
-        public void SaveViewToImage (string name, int image_width, int image_height)
+        public void SaveViewToImage (string name, int image_width, int image_height, string format)
         {
             this.LookAt(name);
             Renga.IView view = renga_application.ActiveView;
@@ -116,8 +116,16 @@ namespace renga_view_points
             Renga.IScreenshotSettings settings = serv.CreateSettings();
             settings.Width = image_width;
             settings.Height = image_height;
-            serv.MakeScreenshot(settings);
-            //Куда сохраняется ?)
+
+            Renga.IImage image = serv.MakeScreenshot(settings);
+
+            Renga.ImageFormat image_format = Renga.ImageFormat.ImageFormat_PNG;
+            format = format.ToLower();
+            if (format == "bmp") image_format = Renga.ImageFormat.ImageFormat_BMP;
+            else image_format = Renga.ImageFormat.ImageFormat_PNG;
+
+            string save_path = init_app.dir_save_images + "\\" + name + $"-{image_width}x{image_width}.{format}";
+            image.SaveToFile(save_path, image_format);
 
         }
         /// <summary>
@@ -125,11 +133,11 @@ namespace renga_view_points
         /// </summary>
         /// <param name="image_width"></param>
         /// <param name="image_height"></param>
-        public void SaveViewsToImage (int image_width, int image_height)
+        public void SaveViewsToImage (int image_width, int image_height, string format)
         {
             foreach (string name in GetAllPointsNames())
             {
-                SaveViewToImage(name, image_width, image_height);
+                SaveViewToImage(name, image_width, image_height, format);
             }
         }
         public List<string> GetAllPointsNames()
@@ -143,7 +151,6 @@ namespace renga_view_points
                 }
             }
             return names;
-
         }
         private bool LookAt(string point_name)
         {
