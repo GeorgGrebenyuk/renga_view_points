@@ -158,6 +158,8 @@ namespace renga_view_points
                 string selected = lb_saved_points.SelectedItem.ToString();
                 new VP_data().SaveViewToImage(selected, width, height, format);
             }
+            init_app.renga_application.UI.ShowMessageBox(Renga.MessageIcon.MessageIcon_Info, "Сообщение", "Экспорт завершен! \n" +
+                $"Файлы см. в каталоге {init_app.dir_save_images}");
             
         }
         /// <summary>
