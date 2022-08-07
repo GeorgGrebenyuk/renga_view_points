@@ -21,16 +21,18 @@ namespace renga_view_points
 
             //Проверка, зарегистрировано ли такое свойство в Проекте и назначено ли категории "Проект"
             //CheckProperty();
-
-            //Вызов окна с сохранением точек обзора в файл -- в свойство Проекта не записывается :( 
+            //Так как в сущности Проекта нельзя записывать данные, это мы делаем в форме внешнего текстового файла
             if (init_app.vp_file_path == null) save_settings_to_file();
 
             //Заполнение listbox именами имеющихся
             UpdateList();
+            //Установка значений по умолчанию
             tb_vp_name.Text = "Точка-";
-            
+            this.select_size.SelectedIndex = 28;
+            this.image_formats.SelectedIndex = 0;
+            this.go_to_point.Checked = true;
 
-            save_image_path.Enabled = false;
+            //save_image_path.Enabled = false;
             //chb_use_hidden.Enabled = false;
             //start_saving_images.Enabled = false;
         }
@@ -44,16 +46,26 @@ namespace renga_view_points
             }
         }
 
+        /// <summary>
+        /// При каждом выделении пользователем точки из списка, происходит авто-переход на неё в модели
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void lb_saved_points_SelectedIndexChanged(object sender, EventArgs e)
         {
             lb_saved_points.SelectionMode = SelectionMode.One;
 
-            if (lb_saved_points.SelectedIndex != -1)
+            if (lb_saved_points.SelectedIndex != -1 && this.go_to_point.Checked)
             {
                 new VP_data().LookThatPosition(lb_saved_points.SelectedItem.ToString());
             }
+            
         }
-
+        /// <summary>
+        /// Операция добавления новой точки с проверкой, не существует ли одноименная ей
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button_add_point_Click(object sender, EventArgs e)
         {
             if (tb_vp_name.Text.Length < 1 
@@ -83,7 +95,11 @@ namespace renga_view_points
 
 
         }
-
+        /// <summary>
+        /// Операция удаления выбранной точки по имени
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button_delete_point_Click(object sender, EventArgs e)
         {
             if (lb_saved_points.SelectedIndex != -1)
@@ -93,21 +109,33 @@ namespace renga_view_points
             }
             UpdateList();
         }
-
+        /// <summary>
+        /// Фиксирование праметра -- учитывать режим скрытия
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void chb_use_hidden_CheckedChanged(object sender, EventArgs e)
         {
             if (chb_use_hidden.Checked) init_app.use_hidded_objects = true;
+            else
+            {
+                init_app.use_hidded_objects = false;
+            }
         }
 
-        private void save_image_path_Click(object sender, EventArgs e)
-        {
-            //SaveFileDialog fd = new SaveFileDialog();
-            //fd.Title = "Укажите папку, куда будут сохранены файлы";
+        //private void save_image_path_Click(object sender, EventArgs e)
+        //{
+        //    //SaveFileDialog fd = new SaveFileDialog();
+        //    //fd.Title = "Укажите папку, куда будут сохранены файлы";
 
-            //if (fd.ShowDialog() == DialogResult.Cancel) return;
-            //init_app.dir_save_images = System.IO.Path.GetDirectoryName(fd.FileName);
-        }
-
+        //    //if (fd.ShowDialog() == DialogResult.Cancel) return;
+        //    //init_app.dir_save_images = System.IO.Path.GetDirectoryName(fd.FileName);
+        //}
+        /// <summary>
+        /// Запуск операции создания изображения с обработкой параметров сохранения
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void start_saving_images_Click(object sender, EventArgs e)
         {
             init_app.dir_save_images = System.IO.Path.GetDirectoryName(init_app.vp_file_path);
@@ -132,12 +160,17 @@ namespace renga_view_points
             }
             
         }
-
+        /// <summary>
+        /// Сохранение настроек (точек обзора) в файл
+        /// </summary>
         private void save_settings_Click(object sender, EventArgs e)
         {
             //if (init_app.vp_file_path == null) save_settings_to_file();
             save_settings_to_file();
         }
+        /// <summary>
+        /// Просто внутренний метод для сохранения файла точек
+        /// </summary>
         private void save_settings_to_file()
         {
             SaveFileDialog fd = new SaveFileDialog();
@@ -150,6 +183,11 @@ namespace renga_view_points
             if (fd.ShowDialog() == DialogResult.Cancel) return;
             init_app.vp_file_path = fd.FileName;
         }
+        /// <summary>
+        /// Загрузка точек обзора из файла. Выполняется при старте приложения на новом проекте
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         private void load_settings_Click(object sender, EventArgs e)
         {
@@ -161,7 +199,11 @@ namespace renga_view_points
             if (fd.ShowDialog() == DialogResult.Cancel) return;
             init_app.vp_file_path = fd.FileName;
         }
-
+        /// <summary>
+        /// Обновление сцены для выделенной позиции
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void update_point_Click(object sender, EventArgs e)
         {
             if (lb_saved_points.SelectedIndex != -1)
@@ -177,7 +219,11 @@ namespace renga_view_points
             
             UpdateList();
         }
-
+        /// <summary>
+        /// Получение параметров текущего положеняи камеры
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
             Renga.IView3DParams view_params = init_app.renga_application.ActiveView as Renga.IView3DParams;
@@ -231,8 +277,13 @@ namespace renga_view_points
             }
             this.elev_by_level.Text = ((view_params.Camera.Position.Z -
                 levels.Where(a => a.LevelName == this.levels.Items[0].ToString()).First().Elevation)/1000.0).ToString();
-
+            this.levels.SelectedIndex = 0;
         }
+        /// <summary>
+        /// Обновление позиции камеры с учетом новых параметров
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             Renga.FloatPoint3D position_ = new Renga.FloatPoint3D();
@@ -303,7 +354,11 @@ namespace renga_view_points
         {
 
         }
-
+        /// <summary>
+        /// Изменение относительной высоты точки камеры для выбранного уровня
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void levels_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -319,6 +374,10 @@ namespace renga_view_points
         {
 
         }
+        /// <summary>
+        /// Внутренняя операция получения уровней модели
+        /// </summary>
+        /// <returns></returns>
         private static List<Renga.ILevel> get_levels()
         {
             Renga.IModelObjectCollection collection = init_app.renga_application.Project.Model.GetObjects();
@@ -337,6 +396,15 @@ namespace renga_view_points
         }
 
         private void image_formats_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+        /// <summary>
+        /// Опция для предотвращения лишних загрузок сцены при щелчке на точке
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void go_to_point_CheckedChanged(object sender, EventArgs e)
         {
 
         }
