@@ -3,4 +3,4 @@
 
 # Установка, использование
 
-Читай [Справку](https://github.com/GeorgGrebenyuk/renga_view_points/wiki)
+Читай [Справку](https://github.com/GeorgGrebenyuk/renga_view_points/wiki/0.-Руководство-к-использованию)
