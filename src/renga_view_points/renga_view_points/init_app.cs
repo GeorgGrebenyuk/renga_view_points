@@ -15,11 +15,19 @@ namespace renga_view_points
         public static bool use_hidded_objects = false;
 
         public static Renga.Application renga_application = null;
-        Renga.ActionEventSource follow_action;
+        private Renga.ActionEventSource follow_action;
+        private Renga.ApplicationEventSource follow_app;
+
         public bool Initialize(string pluginFolder)
         {
             renga_application = new Renga.Application();
             if (renga_application == null) return false;
+            //Включаем отслеживание закрытия проекта -- чтобы обнулить наш файл точек обзора
+            follow_app = new ApplicationEventSource(renga_application);
+            follow_app.ProjectClose += (o, s) =>
+            {
+                vp_file_path = null;
+            };
             Renga.IUI renga_ui = renga_application.UI;
             Renga.IUIPanelExtension panel = renga_ui.CreateUIPanelExtension();
 
@@ -33,6 +41,7 @@ namespace renga_view_points
             follow_action = new ActionEventSource(our_button);
             follow_action.Triggered += (sender, args) =>
             {
+                //Запускаем диалоговое окно с управлением точками обзора
                 System.Windows.Forms.Form view_p_window = new LookViewPoints();
                 System.Windows.Forms.Application.Run(view_p_window);
                 //view_p_window.Close();
@@ -47,6 +56,7 @@ namespace renga_view_points
         public void Stop()
         {
             follow_action.Dispose();
+            follow_app.Dispose();
         }
     }
 }
